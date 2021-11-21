@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Reporter = require('../models/reporter')
+const auth = require('../middleware/auth')
 
 //signup reporters
 router.post('/signup',async(req,res)=>{
@@ -17,7 +18,7 @@ router.post('/signup',async(req,res)=>{
      }
 })
 
-
+//login
 router.post('/login',async(req,res)=>{
     try{
 
@@ -31,6 +32,11 @@ router.post('/login',async(req,res)=>{
     catch(e){
         res.status(500).send('Error'+e)
     }
+})
+
+//profile
+router.get('/profile',auth,async(req,res)=>{
+    res.send(req.reporter)
 })
 
 
