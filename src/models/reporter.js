@@ -66,6 +66,12 @@ const reporterSchema = new mongoose.Schema(
 },{timestamps: true })
 
 
+//relation
+reporterSchema.virtual('news',{
+    ref:'News',
+    localField:'_id',
+    foreignField:'owner'
+})
 reporterSchema.pre('save',async function(next){
     const reporter = this
     if(reporter.isModified('password')){
@@ -77,12 +83,14 @@ reporterSchema.pre('save',async function(next){
 
 //check user credentials
 reporterSchema.statics.findByCredentials = async (email,password)=>{
-    const reporter = Reporter.findOne({email})
+    //console.log(email + password)
+    const reporter = await Reporter.findOne({email})
+    //console.log(reporter)
     if(!reporter){
         throw new Error('Please Sign Up')
     }
-    
-    if(reporter.password != password){
+    const isMatched = await bcrypt.compare(password,reporter.password)
+    if( !isMatched){
         throw new Error('Invalid Password')
     }
     return reporter
