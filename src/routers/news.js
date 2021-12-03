@@ -13,11 +13,26 @@ router.post('/addnews',auth,async(req,res)=>{
         res.status(200).send(news)
     }
     catch(e){
-        res.status(400).send('Error'+e)
+        res.status(400).send(e)
     }
 })
 
+//get all news 
 
+router.get('/allnews',auth,async(req,res)=>{
+
+    try{
+        const news = await News.find({})
+        if(!news){
+            return res.status(404).send('No tasks to show')
+        }
+        res.status(200).send(news)
+    }
+    catch(e){
+        res.status(400).send(e)
+    }
+
+})
 //show reporter news
 router.get('/news',auth,async(req,res)=>{
     try{
@@ -28,7 +43,7 @@ router.get('/news',auth,async(req,res)=>{
         res.status(200).send(news)
     }
     catch(e){
-        res.status(400).send('Error'+e)
+        res.status(400).send(e)
     }
 })
 
@@ -40,7 +55,7 @@ router.get('/mynews',auth,async(req,res)=>{
       res.status(200).send(req.reporter.news)
     }
     catch(e){
-        res.status(400).send('Error'+e)
+        res.status(400).send(e)
     }
 
 })
@@ -55,7 +70,7 @@ router.get('/targetnews/:id',auth,async(req,res)=>{
         res.status(200).send(news)
     }
     catch(e){
-        res.status(400).send('Error'+e)
+        res.status(400).send(e)
     }
 })
 
@@ -70,14 +85,14 @@ router.patch('/editnews/:id',auth,async(req,res)=>{
         })
         
         if(!news){
-            return res.status(404).send('Task Not Found')
+            return res.status(404).send('News Not Found')
         }
        // updates.forEach((e)=>news[e]=req.body[e])
         //await news.save()
         res.status(200).send(news)
     }
     catch(e){
-        res.status(400).send('Error'+e)
+        res.status(400).send(e)
     }
 })
 
@@ -96,13 +111,13 @@ const uploads = multer({
     }
 })
 
-router.post('/newsphoto/:id',auth,uploads.single('postPic'),async(req,res)=>{
+router.post('/newsphoto/:id',auth,uploads.single('avatar'),async(req,res)=>{
     try{
         const news = await News.findOne({_id:req.params.id,owner:req.reporter._id})
         if(!news){
-            return res.status(404).send('TaskNotFound')
+            return res.status(404).send('NewsNotFound')
         }
-        news.postPic =  req.file.buffer
+        news.avatar =  req.file.buffer
         await news.save()
         res.send('uploaded')
     }

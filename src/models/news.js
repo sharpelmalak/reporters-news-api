@@ -12,7 +12,7 @@ const newsSchema = mongoose.Schema({
         trim:true,
         required:true
     },
-    postPic:{
+    avatar:{
         type:Buffer
     },
     owner:{
@@ -20,6 +20,15 @@ const newsSchema = mongoose.Schema({
         required:true
     }
 },{timestamps:true})
+
+newsSchema.methods.toJSON = function(){
+    const news = this
+    const newsObject = news.toObject()
+
+    
+    
+    return newsObject
+}
 
 const News = mongoose.model('News',newsSchema)
 

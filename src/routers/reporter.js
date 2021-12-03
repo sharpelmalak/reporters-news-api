@@ -15,7 +15,7 @@ router.post('/signup',async(req,res)=>{
      }
 
      catch(e){
-         res.status(500).send('Error' + e)
+         res.status(500).send(e)
      }
 })
 
@@ -24,7 +24,7 @@ router.post('/login',async(req,res)=>{
     try{
         //console.log(req.body.email + req.body.password)
         const reporter = await Reporter.findByCredentials(req.body.email,req.body.password)
-        console.log(reporter)
+        //console.log(reporter)
         const token = await reporter.generateToken()
         if(!reporter){
            return res.status(404).send('User Not Found')
@@ -32,7 +32,7 @@ router.post('/login',async(req,res)=>{
         res.status(200).send({reporter,token})
     }
     catch(e){
-        res.status(500).send('Error'+e)
+        res.status(500).send(e)
     }
 })
 
@@ -53,13 +53,13 @@ router.patch('/editprofile',auth,async(req,res)=>{
           return  res.status(400).send('cannot perform update')
         }
         //console.log(req._id)
-        const reporter = await Reporter.findById(req.reporter._id)
-        if(!reporter){
-          return  res.status(400).send('please authinticate')
-        }
-        updates.forEach((e)=>{reporter[e]=req.body[e]})
-        await reporter.save()
-        res.status(200).send(reporter)
+        //const reporter = await Reporter.findById(req.reporter._id)
+        // if(!reporter){
+        //   return  res.status(400).send('please authinticate')
+        // }
+        updates.forEach((e)=>{req.reporter[e]=req.body[e]})
+        await req.reporter.save()
+        res.status(200).send(req.reporter)
 
 
     }
@@ -69,28 +69,53 @@ router.patch('/editprofile',auth,async(req,res)=>{
 })
 
 // upload profile pic
-const uploads = multer({
+// const uploads = multer({
     
+//     limits:{
+//         fileSize:1000000
+//     },
+//     fileFilter(req,file,cb){
+//         if(! file.originalname.match(/\.(jpg|jpeg|png|jfif)$/)){
+//             cb(new Error('you must upload image'))
+//         }
+//         cb(null,true)
+//     }
+// })
+
+// router.post('/profile/photo',auth,uploads.single('avatar'),async(req,res)=>{
+//     try{
+//                req.reporter.avatar = req.file.buffer
+//                await req.reporter.save()
+//                res.send('done')
+//     }
+//     catch(e){
+//         res.status(400).send('error'+e)
+//     }
+// })
+const uploads = multer({
     limits:{
-        fileSize:1000000
+        // 1MG
+        //fileSize:1000000 
     },
+
     fileFilter(req,file,cb){
-        if(! file.originalname.match(/\.(jpg|jpeg|png|jfif)$/)){
-            cb(new Error('you must upload image'))
+        //dhfdurrty475----6.png
+        if(!file.originalname.match(/\.(jpg|jpeg|png|jfif)$/)){
+            cb(new Error('Sorry you must upload image'))
         }
         cb(null,true)
     }
 })
 
-router.post('/profile/photo',auth,uploads.single('avatar'),async(req,res)=>{
-    try{
-               req.reporter.avatar = req.file.buffer
-               await req.reporter.save()
-               res.send('uploaded')
-    }
-    catch(e){
-        res.status(400).send(e)
-    }
+router.post('/profile/avatar',auth,uploads.single('avatar'),async(req,res)=>{
+   try{
+       req.reporter.avatar = req.file.buffer
+       await req.reporter.save()
+       res.send()
+   }
+   catch(e){
+       res.status(500).send("Error"+e)
+   }
 })
 
 //delete account
@@ -103,7 +128,7 @@ router.delete('/removeaccount',auth,async(req,res)=>{
         res.status(200).send(reporter)
     }
     catch(e){
-        res.status(400).send('Error'+e)
+        res.status(400).send(e)
     }
 })
 
@@ -114,10 +139,10 @@ router.delete('/logout',auth,async(req,res)=>{
             return e.token != req.token
         })
         await req.reporter.save()
-        res.send('loged out')
+        res.send()
     }
     catch(e){
-        res.status(400).send('Error'+e)
+        res.status(400).send(e)
     }
 })
 
@@ -129,7 +154,7 @@ router.delete('/logoutall',auth,async(req,res)=>{
         res.send('Loged Out From All devices')
     }
     catch(e){
-        res.status(400).send('Error'+e)
+        res.status(400).send(e)
     }
 })
 

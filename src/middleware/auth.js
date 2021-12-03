@@ -5,7 +5,7 @@ const auth = async(req,res,next)=>{
     try{
         const token = req.header('Authorization').replace('Bearer ','')
         //console.log(token)
-        const decode = jwt.verify(token,'publicKey')
+        const decode = jwt.verify(token,process.env.JWT_KEY)
         //console.log(decode)
         const reporter = await Reporter.findOne({_id:decode._id,'tokens.token':token})
        // console.log(reporter)
@@ -18,7 +18,7 @@ const auth = async(req,res,next)=>{
         next()
     }
     catch(e){
-           res.status(400).send({Error:'Please authenticate'})
+           res.status(400).send(e)
     }
 }
 

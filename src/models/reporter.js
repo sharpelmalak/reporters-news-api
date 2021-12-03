@@ -20,7 +20,7 @@ const reporterSchema = new mongoose.Schema(
         unique:true,
         validate(value){
           if(!validator.isEmail(value)){
-              throw new Error('Invalid Email address')
+              throw new Error()
           }
         }
     },
@@ -40,7 +40,7 @@ const reporterSchema = new mongoose.Schema(
         validate(value){
             if(!validator.isMobilePhone(value,'ar-EG'))
             {
-                throw new Error('Invalid Phone Number')
+                throw new Error('invalid')
             }
         }
          },
@@ -61,7 +61,7 @@ const reporterSchema = new mongoose.Schema(
 
         avatar:{
             type:Buffer
-        },
+        }
         
 },{timestamps: true })
 
@@ -101,7 +101,7 @@ reporterSchema.statics.findByCredentials = async (email,password)=>{
 reporterSchema.methods.generateToken = async function(){
     const reporter = this
     //console.log(this)
-    const token = await jwt.sign({_id:reporter._id.toString()},'publicKey')
+    const token = await jwt.sign({_id:reporter._id.toString()},process.env.JWT_KEY)
     //console.log(token)
     reporter.tokens = reporter.tokens.concat({token})
     //reporter.tokens.push({token})
